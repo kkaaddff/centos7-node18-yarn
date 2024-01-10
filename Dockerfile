@@ -1,14 +1,23 @@
-FROM centos:latest
-LABEL maintainer="Carlos Castaño <calbertts@gmail.com>"
+# 一个包括了 centos7 node18 和 yarn1.22.21 的镜像
 
-ENV QUICKJS_VERSION="2020-07-05"
-ENV QUICKJS_TAR="https://bellard.org/quickjs/quickjs-${QUICKJS_VERSION}.tar.xz"
+FROM centos:7
 
-ADD $QUICKJS_TAR .
+# 安装node
+RUN curl -sL https://rpm.nodesource.com/setup_18.x | bash - &&
+  yum install -y nodejs
 
-RUN yum -y install make gcc
+# 安装yarn
+RUN curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo &&
+  yum install -y yarn-1.22.21
 
-RUN tar Jxf quickjs-${QUICKJS_VERSION}.tar.xz && cd quickjs-${QUICKJS_VERSION} && make install
+# 安装git
+RUN yum install -y git
 
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# 安装python3
+RUN yum install -y python3
+
+# 安装python3的pip
+RUN yum install -y python3-pip
+
+# 安装 node-gyp 环境
+RUN npm install -g node-gyp
